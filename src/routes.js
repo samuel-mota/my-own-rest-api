@@ -8,8 +8,8 @@ const fs = require('fs');
 let usersDB;
 fs.readFile('./src/users.json', (err, data) => {
   // se o arquivo estiver completamente vazio preencha com array vazio []
-  if (data === null || data == "") data = "[]"; 
-  
+  if (data === null || data == "") data = "[]";
+
   if (err) {
     // const { code } = err;
     // console.log(code); 
@@ -21,9 +21,9 @@ fs.readFile('./src/users.json', (err, data) => {
     // };
     throw err;
   };
-  
-  usersDB = (JSON.parse(data)); 
-//  console.log(usersDB); 
+
+  usersDB = (JSON.parse(data));
+  //  console.log(usersDB); 
 });
 
 // GET
@@ -50,24 +50,35 @@ routes.post('/users', (req, res) => {
 
   // adicionar usuario
   usersDB.push(newUser);
-  
+
   // salva no arquivo
   saveFileDB(usersDB);
-  
+
   // resposta para o POST
   res.json(newUser);
 });
 
 // PATCH
 routes.patch('/users/:id', (req, res) => {
+  const index = usersDB.indexOf(usersDB.find(u => u.id === req.params.id));
+  const userPartialUpdate = usersDB.find(u => u.id === req.params.id);
+  const body = req.body;
 
+  // atualiza parte usuario
+  for (const key in body) {
+    if (body.hasOwnProperty(key)) {
+      userPartialUpdate[key] = body[key];
+    }
+  }
+
+  // adicionar usuario atualizado
+  usersDB.splice(index, 1, userPartialUpdate);
 
   // salva no arquivo
   saveFileDB(usersDB);
-  
-  // resposta para o POST
-  res.json(newUser);
 
+  // resposta para o POST
+  res.json(userPartialUpdate);
 });
 
 // PUT
@@ -83,7 +94,7 @@ routes.put('/users/:id', (req, res) => {
 
   // adicionar usuario atualizado
   usersDB.splice(index, 1, updateUser);
-  
+
   saveFileDB(usersDB);
 
   res.json(updateUser);
@@ -104,7 +115,7 @@ routes.delete('/users/:id', (req, res) => {
 // ATUALIZA BD PERSISTENTE
 const saveFileDB = (db) => {
   // salva no arquivo
-  fs.writeFile('./src/users.json', JSON.stringify(db), (err) => { 
+  fs.writeFile('./src/users.json', JSON.stringify(db), (err) => {
     if (err) throw err;
     console.log('File saved')
   });
