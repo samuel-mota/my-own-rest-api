@@ -8,7 +8,8 @@ const port = 3000;
 app.use(express.json());
 
 // definir rotas
-app.use('/api', require('./src/routes.js'));
+app.use('/api', require('./src/users.js'));
+app.use('/api', require('./src/menu.js'));
 
 app.listen(port, () => console.log(`Funfando na porta ${port}`));
 
